@@ -8,6 +8,70 @@ docker image ls
 docker image rm <imageId>
 
 2. Run
+docker run -p 8080:8080 docker-gs-ping
+docker ps --all
+docker stop <contId>
+
+docker restart <contId>
+docker ps -a
+
+// run as daemon
+docker run -d -p 8080:8080 --name rest-server docker-gs-ping
+
+3. Run with database (cockroachdb)
+docker volume create roach
+docker network create -d bridge mynet
+
+3.1 start db
+docker run -d \
+--name roach \
+--hostname db \
+--network mynet \
+-p 26257:26257 \
+-p 8080:8080 \
+-v roach:/cockroach/cockroach-data \
+cockroachdb/cockroach:latest-v20.1 start-single-node \
+--insecure
+
+3.2 Init db and user
+docker exec -it roach ./cockroach sql --insecure
+CREATE DATABASE mydb;
+CREATE USER totoro;
+GRANT ALL ON DATABASE mydb TO totoro;
+quit;
+
+3.3 Start example app
+gclo git@github.com:wprzechrzta/docker-gs-ping-roach.git
+
+3.4 Build
+docker build --tag docker-gs-ping-roach .
+
+3.5 Run  and connect to cockroach
+   docker run -it --rm -d \
+   --network mynet \
+   --name rest-server \
+   -p 80:8080 \
+   -e PGUSER=totoro \
+   -e PGPASSWORD=myfriend \
+   -e PGHOST=db \
+   -e PGPORT=26257 \
+   -e PGDATABASE=mydb \
+   docker-gs-ping-roach
+
+curl localhost
+//docker container rm --force rest-server
+
+curl --request POST \
+--url http://localhost/send \
+--header 'content-type: application/json' \
+--data '{"value": "Hello, Docker!"}'
+ 
+or 
+
+curl -X POST \
+--header 'content-type: application/json' \
+--data '{"value": "Hello, Second message!"}' \
+http://localhost/send 
 
 
 # Doc
