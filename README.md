@@ -80,7 +80,18 @@ docker build -t docker-gs-ping:latest .
 - run locally
   go test ./...
   go test -v ./...
-- 
+
+## To trigger github actions release
+setup repo secrets:
+DOCKER_HUB_USERNAME
+DOCKER_HUB_ACCESS_TOKEN 
+
+git tag -a 0.0.1 -m "Test release workflow"
+git push --tags
+
+git push origin :refs/tags/0.0.1
+git tag -fa 0.0.1 -m "Test release workflow"
+git push origin --tags
 
 # Doc
 A simple Go server/microservice example for [Docker's Go Language Guide](https://docs.docker.com/language/golang/).
