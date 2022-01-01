@@ -74,6 +74,14 @@ curl -X POST \
 http://localhost/send 
 
 
+## Running test
+- build image
+docker build -t docker-gs-ping:latest .
+- run locally
+  go test ./...
+  go test -v ./...
+- 
+
 # Doc
 A simple Go server/microservice example for [Docker's Go Language Guide](https://docs.docker.com/language/golang/).
 
